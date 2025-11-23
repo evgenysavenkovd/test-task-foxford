@@ -1,8 +1,10 @@
-import { JwtPayload, Tokens } from '#src/common/types/index.js';
-import { UsersService } from '#src/users/index.js';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import argon from 'argon2';
+
+import { JwtPayload, Tokens } from '#src/common/types/index.js';
+import { UsersService } from '#src/users/index.js';
+
 import { SignInDto, SignUpDto } from '../dto/index.js';
 
 @Injectable()

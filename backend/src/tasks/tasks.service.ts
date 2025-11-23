@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Prisma } from 'generated/prisma/client.js';
 
 import { PrismaService } from '#src/prisma/prisma.service.js';
 import { UsersService } from '#src/users/users.service.js';
@@ -23,10 +24,35 @@ export class TasksService {
       data: {
         name: dto.name,
         description: dto.description,
+        authorId,
         assigneeId: assignee.id,
       },
     });
 
     return task;
+  }
+
+  async getForUser(userId: string) {
+    const include: Prisma.TaskInclude = {
+      assignee: { select: { email: true } },
+      author: { select: { email: true } },
+    };
+
+    const authored = await this.prisma.task.findMany({
+      where: { authorId: userId },
+      include,
+      orderBy: { createdAt: 'desc' },
+    });
+    const assigned = await this.prisma.task.findMany({
+      where: { assigneeId: userId },
+      include,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const tasks = [...authored, ...assigned].sort(
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+    );
+
+    return tasks;
   }
 }

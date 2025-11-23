@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email        String   @unique
-  password     String
-  registeredAt DateTime @default(now())
-  tasks        Task[]
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email         String   @unique
+  password      String
+  registeredAt  DateTime @default(now())
+  tasksAuthored Task[]   @relation("AuthorRelation")
+  tasksAssigned Task[]   @relation("AssigneeRelation")
 }
 
 model Task {
@@ -20,6 +21,9 @@ model Task {
   name        String
   description String
   createdAt   DateTime @default(now()) @db.Timestamp()
-  assignee    User     @relation(fields: [assigneeId], references: [id])
+  authorId    String   @db.Uuid
   assigneeId  String   @db.Uuid
+
+  author   User @relation("AuthorRelation", fields: [authorId], references: [id])
+  assignee User @relation("AssigneeRelation", fields: [assigneeId], references: [id])
 }

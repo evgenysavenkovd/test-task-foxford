@@ -40,9 +40,13 @@ export class AuthController {
   @ApiUnauthorizedResponse({
     description: 'Пароль или почта некорректны',
   })
-  async signIn(@Body() dto: SignInDto, @Res() res: FastifyReply) {
+  async signIn(
+    @Body() dto: SignInDto,
+    @Res({ passthrough: true }) res: FastifyReply,
+  ) {
     const tokens = await this.authService.signIn(dto);
     this.authCookiesService.setAuthTokens(res, tokens);
+    this.authCookiesService.setIsAuth(res);
     return true;
   }
 
@@ -65,9 +69,13 @@ export class AuthController {
   @ApiBadRequestResponse({
     description: 'Пароль или почта не прошли валидацию',
   })
-  async signUp(@Body() dto: SignUpDto, @Res() res: FastifyReply) {
+  async signUp(
+    @Body() dto: SignUpDto,
+    @Res({ passthrough: true }) res: FastifyReply,
+  ) {
     const tokens = await this.authService.signUp(dto);
     this.authCookiesService.setAuthTokens(res, tokens);
+    this.authCookiesService.setIsAuth(res);
     return true;
   }
 }

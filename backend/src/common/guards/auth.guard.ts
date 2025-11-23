@@ -1,4 +1,3 @@
-import { AuthCookiesService } from '#src/auth/services/auth-cookies.service.js';
 import {
   CanActivate,
   ExecutionContext,
@@ -6,7 +5,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { FastifyRequest } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
+
+import { AuthCookiesService } from '#src/auth/services/auth-cookies.service.js';
+
 import { JwtPayload } from '../types/index.js';
 
 @Injectable()
@@ -21,6 +23,8 @@ export class AuthGuard implements CanActivate {
 
     const tokens = this.authCookiesService.getAuthTokens(request);
     if (!tokens) {
+      const res = context.switchToHttp().getResponse<FastifyReply>();
+      this.authCookiesService.clearAuthTokens(res);
       throw new UnauthorizedException();
     }
 
@@ -29,6 +33,8 @@ export class AuthGuard implements CanActivate {
     const payload = await this.jwtService.verifyAsync<JwtPayload>(accessToken);
 
     if (!payload) {
+      const res = context.switchToHttp().getResponse<FastifyReply>();
+      this.authCookiesService.clearAuthTokens(res);
       throw new UnauthorizedException();
     }
 

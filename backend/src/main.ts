@@ -1,9 +1,11 @@
+import fastifyCookie from '@fastify/cookie';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
 import { AppModule } from './app.module.js';
 
 async function bootstrap() {
@@ -11,6 +13,17 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
+
+  const corsOrigins = process.env.CORS_ORIGINS?.split(',') ?? [
+    'http://localhost:5173',
+  ];
+
+  await app.register(fastifyCookie);
+
+  app.enableCors({
+    origin: corsOrigins,
+    credentials: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Тестовое задание для Фоксфорд')
