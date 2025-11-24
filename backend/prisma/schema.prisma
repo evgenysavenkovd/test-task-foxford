@@ -26,4 +26,7 @@ model Task {
 
   author   User @relation("AuthorRelation", fields: [authorId], references: [id])
   assignee User @relation("AssigneeRelation", fields: [assigneeId], references: [id])
+
+  @@index([authorId])
+  @@index([assigneeId])
 }
