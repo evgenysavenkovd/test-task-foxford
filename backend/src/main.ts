@@ -1,4 +1,5 @@
 import fastifyCookie from '@fastify/cookie';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -19,6 +20,8 @@ async function bootstrap() {
   ];
 
   await app.register(fastifyCookie);
+
+  app.useGlobalPipes(new ValidationPipe());
 
   app.enableCors({
     origin: corsOrigins,
